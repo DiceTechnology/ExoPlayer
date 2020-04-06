@@ -960,7 +960,7 @@ public class PlayerControlView extends FrameLayout {
     }
     long durationMs = C.usToMs(durationUs);
     if (durationView != null) {
-      durationView.setText(Util.getStringForTime(formatBuilder, formatter, durationMs));
+      durationView.setText(Util.getStringForTime(formatBuilder, formatter, player.getEndPosition()));
     }
     if (timeBar != null) {
       timeBar.setDuration(durationMs);
@@ -990,7 +990,7 @@ public class PlayerControlView extends FrameLayout {
       bufferedPosition = currentWindowOffset + player.getContentBufferedPosition();
     }
     if (positionView != null && !scrubbing) {
-      positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
+      positionView.setText(Util.getStringForTime(formatBuilder, formatter, player.getStartPosition()));
     }
     if (timeBar != null) {
       timeBar.setPosition(position);
@@ -1256,14 +1256,22 @@ public class PlayerControlView extends FrameLayout {
     public void onScrubStart(TimeBar timeBar, long position) {
       scrubbing = true;
       if (positionView != null) {
-        positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
+          if (player.isCurrentWindowLive()) {
+              positionView.setText(Util.getStringForTime(formatBuilder, formatter, position - player.getDuration()));
+          } else {
+              positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
+          }
       }
     }
 
     @Override
     public void onScrubMove(TimeBar timeBar, long position) {
       if (positionView != null) {
-        positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
+          if (player.isCurrentWindowLive()) {
+              positionView.setText(Util.getStringForTime(formatBuilder, formatter, position - player.getDuration()));
+          } else {
+              positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
+          }
       }
     }
 
