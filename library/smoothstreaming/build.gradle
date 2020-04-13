@@ -15,7 +15,7 @@ apply from: '../../constants.gradle'
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group="com.github.DiceTechnology"
+group='com.github.DiceTechnology'
 
 android {
     compileSdkVersion project.ext.compileSdkVersion
