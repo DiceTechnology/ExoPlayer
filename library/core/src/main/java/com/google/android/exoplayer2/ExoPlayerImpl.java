@@ -499,6 +499,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
   }
 
   @Override
+  public long getStartPosition() {
+    return 0;
+  }
+
+  @Override
+  public long getEndPosition() {
+    return getDuration();
+  }
+
+  @Override
   public long getBufferedPosition() {
     if (isPlayingAd()) {
       return playbackInfo.loadingMediaPeriodId.equals(playbackInfo.periodId)

@@ -529,6 +529,16 @@ public final class CastPlayer extends BasePlayer {
   }
 
   @Override
+  public long getStartPosition() {
+    return 0;
+  }
+
+  @Override
+  public long getEndPosition() {
+    return getDuration();
+  }
+
+  @Override
   public long getBufferedPosition() {
     return getCurrentPosition();
   }

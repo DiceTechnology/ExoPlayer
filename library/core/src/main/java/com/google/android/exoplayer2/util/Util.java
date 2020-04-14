@@ -15,8 +15,6 @@
  */
 package com.google.android.exoplayer2.util;
 
-import static android.content.Context.UI_MODE_SERVICE;
-
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -45,7 +43,9 @@ import android.text.TextUtils;
 import android.view.Display;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+
 import androidx.annotation.Nullable;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Format;
@@ -57,6 +57,12 @@ import com.google.android.exoplayer2.SeekParameters;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
+
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.nullness.compatqual.NullableType;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.PolyNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -82,10 +88,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
-import org.checkerframework.checker.nullness.compatqual.NullableType;
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.checkerframework.checker.nullness.qual.PolyNull;
+
+import static android.content.Context.UI_MODE_SERVICE;
 
 /**
  * Miscellaneous utility methods.
@@ -1605,8 +1609,20 @@ public final class Util {
     long minutes = (totalSeconds / 60) % 60;
     long hours = totalSeconds / 3600;
     builder.setLength(0);
-    return hours > 0 ? formatter.format("%d:%02d:%02d", hours, minutes, seconds).toString()
-        : formatter.format("%02d:%02d", minutes, seconds).toString();
+
+    if (hours == 0) {
+      if (minutes < 0) {
+        return formatter.format("%02d:%02d", minutes, seconds * -1).toString();
+      } else {
+        return formatter.format("%02d:%02d", minutes, seconds).toString();
+      }
+    } else {
+      if (hours < 0) {
+        return formatter.format("%d:%02d:%02d", hours, minutes * -1, seconds * -1).toString();
+      } else {
+        return formatter.format("%d:%02d:%02d", hours, minutes, seconds).toString();
+      }
+    }
   }
 
   /**
