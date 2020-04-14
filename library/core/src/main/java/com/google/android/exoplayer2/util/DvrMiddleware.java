@@ -6,6 +6,10 @@ public final class DvrMiddleware {
      * The time, in milliseconds, to use as the end position for a live DVR window.
      */
     public static final long LIVE_DVR_END_POSITION = 0;
+    /**
+     * The length of one video segment in milliseconds.
+     */
+    private static final long SEGMENT_LENGTH_MS = 6000;
 
     /**
      * Converts a positive position, in milliseconds, to a negative position. A negative position
@@ -17,7 +21,8 @@ public final class DvrMiddleware {
      * @throws IllegalArgumentException If {@param positionMs} isn't positive.
      */
     public static long convertToNegativePosition(long positionMs, long durationMs) {
-        Assertions.checkArgument(positionMs > 0);
+        Log.e("Marcel", "Position passed = " + positionMs);
+        Assertions.checkArgument(positionMs >= -1 * SEGMENT_LENGTH_MS);
         return positionMs - durationMs;
     }
 
@@ -31,7 +36,7 @@ public final class DvrMiddleware {
      * @throws IllegalArgumentException If {@param positionMs} isn't negative.
      */
     public static long convertToPositivePosition(long positionMs, long durationMs) {
-        Assertions.checkArgument(positionMs < 0);
+        Assertions.checkArgument(positionMs <= 0);
         return positionMs + durationMs;
     }
 }

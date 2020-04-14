@@ -1280,7 +1280,11 @@ public class PlayerControlView extends FrameLayout {
     public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
       scrubbing = false;
       if (!canceled && player != null) {
-        seekToTimeBarPosition(player, position);
+        if (player.isCurrentWindowLive()) {
+          seekToTimeBarPosition(player, DvrMiddleware.convertToNegativePosition(position, player.getDuration()));
+        } else {
+          seekToTimeBarPosition(player, position);
+        }
       }
     }
 
