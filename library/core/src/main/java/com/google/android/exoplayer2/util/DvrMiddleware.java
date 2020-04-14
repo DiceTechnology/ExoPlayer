@@ -21,7 +21,6 @@ public final class DvrMiddleware {
      * @throws IllegalArgumentException If {@param positionMs} isn't positive.
      */
     public static long convertToNegativePosition(long positionMs, long durationMs) {
-        Log.e("Marcel", "Position passed = " + positionMs);
         Assertions.checkArgument(positionMs >= -1 * SEGMENT_LENGTH_MS);
         return positionMs - durationMs;
     }
