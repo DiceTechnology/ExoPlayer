@@ -960,6 +960,14 @@ public interface Player {
   long getCurrentPosition();
 
   /**
+   * Converts a given position to the equivalent DVR position.
+   *
+   * @param position The position to be converted.
+   * @return The DVR position.
+   */
+  long getDvrPosition(long position);
+
+  /**
    * Returns the position in the current content window at which playback should start, in
    * milliseconds. For live video streams with DVR content this will return a negative number.
    * */

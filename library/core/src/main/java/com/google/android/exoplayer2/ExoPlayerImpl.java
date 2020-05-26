@@ -499,6 +499,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
   }
 
   @Override
+  public long getDvrPosition(long position) {
+    return getCurrentPosition();
+  }
+
+  @Override
   public long getStartPosition() {
     return 0;
   }

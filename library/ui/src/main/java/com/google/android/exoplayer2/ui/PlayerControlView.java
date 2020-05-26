@@ -38,7 +38,6 @@ import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.util.Assertions;
-import com.google.android.exoplayer2.util.DvrMiddleware;
 import com.google.android.exoplayer2.util.RepeatModeUtil;
 import com.google.android.exoplayer2.util.Util;
 import java.util.Arrays;
@@ -1258,7 +1257,7 @@ public class PlayerControlView extends FrameLayout {
       scrubbing = true;
       if (positionView != null) {
           if (player.isCurrentWindowLive()) {
-              positionView.setText(Util.getStringForTime(formatBuilder, formatter, DvrMiddleware.convertToNegativePosition(position, player.getDuration())));
+              positionView.setText(Util.getStringForTime(formatBuilder, formatter, player.getDvrPosition(position)));
           } else {
               positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
           }
@@ -1269,7 +1268,7 @@ public class PlayerControlView extends FrameLayout {
     public void onScrubMove(TimeBar timeBar, long position) {
       if (positionView != null) {
           if (player.isCurrentWindowLive()) {
-              positionView.setText(Util.getStringForTime(formatBuilder, formatter, DvrMiddleware.convertToNegativePosition(position, player.getDuration())));
+              positionView.setText(Util.getStringForTime(formatBuilder, formatter, player.getDvrPosition(position)));
           } else {
               positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
           }
@@ -1281,7 +1280,7 @@ public class PlayerControlView extends FrameLayout {
       scrubbing = false;
       if (!canceled && player != null) {
         if (player.isCurrentWindowLive()) {
-          seekToTimeBarPosition(player, DvrMiddleware.convertToNegativePosition(position, player.getDuration()));
+          seekToTimeBarPosition(player, player.getDvrPosition(position));
         } else {
           seekToTimeBarPosition(player, position);
         }
