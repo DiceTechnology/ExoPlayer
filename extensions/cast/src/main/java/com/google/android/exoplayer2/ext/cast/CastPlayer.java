@@ -529,6 +529,11 @@ public final class CastPlayer extends BasePlayer {
   }
 
   @Override
+  public long getDvrPosition(long position) {
+    return getCurrentPosition();
+  }
+
+  @Override
   public long getStartPosition() {
     return 0;
   }
