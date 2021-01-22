@@ -778,21 +778,6 @@ import java.util.concurrent.TimeoutException;
   }
 
   @Override
-  public long getDvrPosition(long position) {
-    return getCurrentPosition();
-  }
-
-  @Override
-  public long getStartPosition() {
-    return 0;
-  }
-
-  @Override
-  public long getEndPosition() {
-    return getDuration();
-  }
-
-  @Override
   public long getBufferedPosition() {
     if (isPlayingAd()) {
       return playbackInfo.loadingMediaPeriodId.equals(playbackInfo.periodId)

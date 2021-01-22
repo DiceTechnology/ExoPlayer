@@ -1041,7 +1041,7 @@ public class PlayerControlView extends FrameLayout {
     }
     long durationMs = C.usToMs(durationUs);
     if (durationView != null) {
-      durationView.setText(Util.getStringForTime(formatBuilder, formatter, player.getEndPosition()));
+      durationView.setText(Util.getStringForTime(formatBuilder, formatter, durationMs));
     }
     if (timeBar != null) {
       timeBar.setDuration(durationMs);
@@ -1071,7 +1071,7 @@ public class PlayerControlView extends FrameLayout {
       bufferedPosition = currentWindowOffset + player.getContentBufferedPosition();
     }
     if (positionView != null && !scrubbing) {
-      positionView.setText(Util.getStringForTime(formatBuilder, formatter, player.getStartPosition()));
+      positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
     }
     if (timeBar != null) {
       timeBar.setPosition(position);
@@ -1316,22 +1316,14 @@ public class PlayerControlView extends FrameLayout {
     public void onScrubStart(TimeBar timeBar, long position) {
       scrubbing = true;
       if (positionView != null) {
-          if (player.isCurrentWindowLive()) {
-              positionView.setText(Util.getStringForTime(formatBuilder, formatter, player.getDvrPosition(position)));
-          } else {
-              positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
-          }
+        positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
       }
     }
 
     @Override
     public void onScrubMove(TimeBar timeBar, long position) {
       if (positionView != null) {
-          if (player.isCurrentWindowLive()) {
-              positionView.setText(Util.getStringForTime(formatBuilder, formatter, player.getDvrPosition(position)));
-          } else {
-              positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
-          }
+        positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
       }
     }
 
@@ -1339,11 +1331,7 @@ public class PlayerControlView extends FrameLayout {
     public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
       scrubbing = false;
       if (!canceled && player != null) {
-        if (player.isCurrentWindowLive()) {
-          seekToTimeBarPosition(player, player.getDvrPosition(position));
-        } else {
-          seekToTimeBarPosition(player, position);
-        }
+        seekToTimeBarPosition(player, position);
       }
     }
 

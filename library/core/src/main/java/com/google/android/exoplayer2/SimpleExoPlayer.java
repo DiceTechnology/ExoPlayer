@@ -1791,21 +1791,6 @@ public class SimpleExoPlayer extends BasePlayer
   }
 
   @Override
-  public long getDvrPosition(long position) {
-    return getCurrentPosition();
-  }
-
-  @Override
-  public long getStartPosition() {
-    return 0;
-  }
-
-  @Override
-  public long getEndPosition() {
-    return getDuration();
-  }
-
-  @Override
   public long getBufferedPosition() {
     verifyApplicationThread();
     return player.getBufferedPosition();
