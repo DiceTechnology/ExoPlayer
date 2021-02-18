@@ -326,6 +326,7 @@ public class PlayerControlView extends FrameLayout {
   private int showTimeoutMs;
   private int timeBarMinUpdateIntervalMs;
   private @RepeatModeUtil.RepeatToggleModes int repeatToggleModes;
+  private boolean showPlayPauseButton;
   private boolean showRewindButton;
   private boolean showFastForwardButton;
   private boolean showPreviousButton;
@@ -366,6 +367,7 @@ public class PlayerControlView extends FrameLayout {
     repeatToggleModes = DEFAULT_REPEAT_TOGGLE_MODES;
     timeBarMinUpdateIntervalMs = DEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS;
     hideAtMs = C.TIME_UNSET;
+    showPlayPauseButton = true;
     showRewindButton = true;
     showFastForwardButton = true;
     showPreviousButton = true;
@@ -637,6 +639,16 @@ public class PlayerControlView extends FrameLayout {
   }
 
   /**
+   * Sets whether the play/pause button is shown.
+   *
+   * @param showPlayPauseButton Whether the play/pause button is shown.
+   */
+  public void setShowPlayPauseButton(boolean showPlayPauseButton) {
+    this.showPlayPauseButton = showPlayPauseButton;
+    updatePlayPauseButton();
+  }
+
+  /**
    * Sets whether the rewind button is shown.
    *
    * @param showRewindButton Whether the rewind button is shown.
@@ -881,12 +893,20 @@ public class PlayerControlView extends FrameLayout {
     boolean requestPlayPauseFocus = false;
     boolean shouldShowPauseButton = shouldShowPauseButton();
     if (playButton != null) {
-      requestPlayPauseFocus |= shouldShowPauseButton && playButton.isFocused();
-      playButton.setVisibility(shouldShowPauseButton ? GONE : VISIBLE);
+      requestPlayPauseFocus |= showPlayPauseButton && shouldShowPauseButton && playButton.isFocused();
+      if (showPlayPauseButton) {
+        playButton.setVisibility(shouldShowPauseButton ? GONE : VISIBLE);
+      } else {
+        playButton.setVisibility(GONE);
+      }
     }
     if (pauseButton != null) {
-      requestPlayPauseFocus |= !shouldShowPauseButton && pauseButton.isFocused();
-      pauseButton.setVisibility(shouldShowPauseButton ? VISIBLE : GONE);
+      requestPlayPauseFocus |= showPlayPauseButton && !shouldShowPauseButton && pauseButton.isFocused();
+      if (showPlayPauseButton) {
+        pauseButton.setVisibility(shouldShowPauseButton ? VISIBLE : GONE);
+      } else {
+        pauseButton.setVisibility(GONE);
+      }
     }
     if (requestPlayPauseFocus) {
       requestPlayPauseFocus();
