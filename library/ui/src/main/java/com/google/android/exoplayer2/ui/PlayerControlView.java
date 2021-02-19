@@ -267,6 +267,17 @@ public class PlayerControlView extends FrameLayout {
     void onProgressUpdate(long position, long bufferedPosition);
   }
 
+  /** Listener to be notified when the DVR window is updated. */
+  public interface DvrWindowListener {
+
+    /**
+     * Called when the DVR window is updated.
+     *
+     * @param hasDvrWindow Indicates whether the stream has a valid DVR window.
+     */
+    void onDvrWindowUpdate(boolean hasDvrWindow);
+  }
+
   /** The default show timeout, in milliseconds. */
   public static final int DEFAULT_SHOW_TIMEOUT_MS = 5000;
   /** The default repeat toggle modes. */
@@ -279,6 +290,9 @@ public class PlayerControlView extends FrameLayout {
 
   /** The maximum interval between time bar position updates. */
   private static final int MAX_UPDATE_INTERVAL_MS = 1000;
+
+  /** The minimum duration of a DVR window in order for it to be considered a valid DVR window. */
+  private static final long MIN_LENGTH_OF_DVR_MS = 120_000;
 
   private final ComponentListener componentListener;
   private final CopyOnWriteArrayList<VisibilityListener> visibilityListeners;
@@ -318,6 +332,7 @@ public class PlayerControlView extends FrameLayout {
   private com.google.android.exoplayer2.ControlDispatcher controlDispatcher;
   @Nullable private ProgressUpdateListener progressUpdateListener;
   @Nullable private PlaybackPreparer playbackPreparer;
+  @Nullable private DvrWindowListener dvrWindowListener;
 
   private boolean isAttachedToWindow;
   private boolean showMultiWindowTimeBar;
@@ -610,6 +625,15 @@ public class PlayerControlView extends FrameLayout {
    */
   public void setProgressUpdateListener(@Nullable ProgressUpdateListener listener) {
     this.progressUpdateListener = listener;
+  }
+
+  /**
+   * Sets the {@link DvrWindowListener}.
+   *
+   * @param listener The listener to be notified when the DVR window is updated.
+   */
+  public void setDvrWindowListener(@Nullable DvrWindowListener listener) {
+    this.dvrWindowListener = listener;
   }
 
   /**
@@ -1060,6 +1084,9 @@ public class PlayerControlView extends FrameLayout {
       }
     }
     long durationMs = C.usToMs(durationUs);
+    if (dvrWindowListener != null && player.isCurrentWindowLive()) {
+      dvrWindowListener.onDvrWindowUpdate(durationMs > MIN_LENGTH_OF_DVR_MS);
+    }
     if (durationView != null) {
       durationView.setText(Util.getStringForTime(formatBuilder, formatter, durationMs));
     }
