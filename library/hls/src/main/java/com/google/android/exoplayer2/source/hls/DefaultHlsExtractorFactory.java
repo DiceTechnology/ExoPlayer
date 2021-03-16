@@ -121,10 +121,6 @@ public final class DefaultHlsExtractorFactory implements HlsExtractorFactory {
       Extractor extractor =
           checkNotNull(
               createExtractorByFileType(fileType, format, muxedCaptionFormats, timestampAdjuster));
-      // Force ADTS extractor for files with .aac extension (Remove once Google patches ExoPlayer)
-      if (fileType == FileTypes.ADTS && uriInferredFileType == FileTypes.ADTS) {
-        return new BundledHlsMediaChunkExtractor(extractor, format, timestampAdjuster);
-      }
       if (sniffQuietly(extractor, extractorInput)) {
         return new BundledHlsMediaChunkExtractor(extractor, format, timestampAdjuster);
       }
