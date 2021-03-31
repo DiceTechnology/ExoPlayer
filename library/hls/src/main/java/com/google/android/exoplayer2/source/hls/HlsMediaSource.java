@@ -565,4 +565,7 @@ public final class HlsMediaSource extends BaseMediaSource
     refreshSourceInfo(timeline);
   }
 
+  public HlsPlaylistTracker getPlaylistTracker() {
+    return playlistTracker;
+  }
 }
