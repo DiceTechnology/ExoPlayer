@@ -629,4 +629,8 @@ public final class HlsMediaSource extends BaseMediaSource
     }
     return offsetToEndOfPlaylistUs + liveEdgeOffsetUs;
   }
+
+  public HlsPlaylistTracker getPlaylistTracker() {
+    return playlistTracker;
+  }
 }
