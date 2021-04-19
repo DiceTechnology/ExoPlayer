@@ -86,8 +86,8 @@ public class DefaultHlsExtractorFactoryTest {
 
   @Test
   public void
-  createExtractor_withFileTypeInResponseHeaders_returnsExtractorMatchingResponseHeaders()
-      throws Exception {
+      createExtractor_withFileTypeInResponseHeaders_returnsExtractorMatchingResponseHeaders()
+          throws Exception {
     ExtractorInput ac3ExtractorInput =
         new FakeExtractorInput.Builder()
             .setData(
