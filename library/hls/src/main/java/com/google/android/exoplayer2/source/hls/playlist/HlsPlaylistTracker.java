@@ -224,6 +224,11 @@ public interface HlsPlaylistTracker {
    */
   boolean isLive();
 
+  /**
+   * Returns the primary media playlist of the tracked HLS playlist.
+   *
+   * @return The primary {@link HlsMediaPlaylist} of the tracked HLS playlist.
+   */
   @Nullable
   default HlsMediaPlaylist getPrimaryMediaPlaylist() {
     return null;
