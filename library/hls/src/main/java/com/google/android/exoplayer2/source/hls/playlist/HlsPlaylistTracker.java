@@ -223,4 +223,9 @@ public interface HlsPlaylistTracker {
    * @return True if the content is live. False otherwise.
    */
   boolean isLive();
+
+  @Nullable
+  default HlsMediaPlaylist getPrimaryMediaPlaylist() {
+    return null;
+  }
 }

@@ -791,4 +791,10 @@ public final class DefaultHlsPlaylistTracker
       return playlistUrl.equals(primaryMediaPlaylistUrl) && !maybeSelectNewPrimaryUrl();
     }
   }
+
+  @Nullable
+  @Override
+  public HlsMediaPlaylist getPrimaryMediaPlaylist() {
+    return primaryMediaPlaylistSnapshot;
+  }
 }
