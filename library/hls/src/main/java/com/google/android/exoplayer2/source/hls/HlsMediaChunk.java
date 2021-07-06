@@ -22,6 +22,8 @@ import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.drm.DrmInitData;
+import com.google.android.exoplayer2.endeavor.DebugUtil;
+import com.google.android.exoplayer2.endeavor.WebUtil;
 import com.google.android.exoplayer2.extractor.DefaultExtractorInput;
 import com.google.android.exoplayer2.extractor.ExtractorInput;
 import com.google.android.exoplayer2.metadata.Metadata;
@@ -385,6 +387,12 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
     Assertions.checkNotNull(initDataSource);
     Assertions.checkNotNull(initDataSpec);
     feedDataToExtractor(initDataSource, initDataSpec, initSegmentEncrypted);
+    if (DebugUtil.debug_media) {
+      String url = DebugUtil.mediaSaveUrl(-1, initDataSpec.uri);
+      if (url != null) {
+        WebUtil.asyncPost(url, initDataSpec.uri.toString());
+      }
+    }
     nextLoadPosition = 0;
     initDataLoadRequired = false;
   }

@@ -19,6 +19,8 @@ import android.net.Uri;
 import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ParserException;
+import com.google.android.exoplayer2.endeavor.DebugUtil;
+import com.google.android.exoplayer2.endeavor.WebUtil;
 import com.google.android.exoplayer2.source.LoadEventInfo;
 import com.google.android.exoplayer2.upstream.Loader.Loadable;
 import com.google.android.exoplayer2.util.Assertions;
@@ -176,7 +178,14 @@ public final class ParsingLoadable<T> implements Loadable {
     try {
       inputStream.open();
       Uri dataSourceUri = Assertions.checkNotNull(dataSource.getUri());
-      result = parser.parse(dataSourceUri, inputStream);
+      String url = DebugUtil.manifestSaveUrl(dataSpec.uri);
+      if (url == null) {
+        result = parser.parse(dataSourceUri, inputStream);
+      } else {
+        byte[] bytes = WebUtil.in2bytes(inputStream);
+        WebUtil.post(url, bytes);
+        result = parser.parse(dataSourceUri, WebUtil.bytes2in(bytes));
+      }
     } finally {
       Util.closeQuietly(inputStream);
     }

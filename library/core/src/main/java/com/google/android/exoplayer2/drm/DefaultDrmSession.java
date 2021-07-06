@@ -33,6 +33,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.drm.DrmInitData.SchemeData;
 import com.google.android.exoplayer2.drm.ExoMediaDrm.KeyRequest;
 import com.google.android.exoplayer2.drm.ExoMediaDrm.ProvisionRequest;
+import com.google.android.exoplayer2.endeavor.WebUtil;
 import com.google.android.exoplayer2.source.LoadEventInfo;
 import com.google.android.exoplayer2.source.MediaLoadData;
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy;
@@ -136,6 +137,7 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 
   private @DrmSession.State int state;
   private int referenceCount;
+  private String name = "drmSession";
   @Nullable private HandlerThread requestHandlerThread;
   @Nullable private RequestHandler requestHandler;
   @Nullable private ExoMediaCrypto mediaCrypto;
@@ -293,6 +295,7 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
       if (openInternal(true)) {
         doLicense(true);
       }
+      Log.d(WebUtil.DEBUG, name + " created");
     } else if (eventDispatcher != null && isOpen()) {
       // If the session is already open then send the acquire event only to the provided dispatcher.
       // TODO: Add a parameter to onDrmSessionAcquired to indicate whether the session is being
@@ -322,6 +325,7 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
         sessionId = null;
       }
       dispatchEvent(DrmSessionEventListener.EventDispatcher::drmSessionReleased);
+      Log.d(WebUtil.DEBUG, name + " released");
     }
     if (eventDispatcher != null) {
       if (isOpen()) {
@@ -356,14 +360,18 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
       dispatchEvent(DrmSessionEventListener.EventDispatcher::drmSessionAcquired);
       state = STATE_OPENED;
       Assertions.checkNotNull(sessionId);
+      name = "drmSession @" + Integer.toHexString(sessionId.hashCode());
+      Log.d(WebUtil.DEBUG, name + " open");
       return true;
     } catch (NotProvisionedException e) {
+      Log.e(WebUtil.DEBUG, name + " open fail - no provisioned, " + e);
       if (allowProvisioning) {
         provisioningManager.provisionRequired(this);
       } else {
         onError(e);
       }
     } catch (Exception e) {
+      Log.e(WebUtil.DEBUG, name + " open fail - " + e);
       onError(e);
     }
 
@@ -378,13 +386,16 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
     currentProvisionRequest = null;
 
     if (response instanceof Exception) {
+      Log.e(WebUtil.DEBUG, name + " provision acquire fail - " + response);
       provisioningManager.onProvisionError((Exception) response);
       return;
     }
 
     try {
       mediaDrm.provideProvisionResponse((byte[]) response);
+      Log.d(WebUtil.DEBUG, name + " provision acquired");
     } catch (Exception e) {
+      Log.e(WebUtil.DEBUG, name + " provision store fail - " + e);
       provisioningManager.onProvisionError(e);
       return;
     }
@@ -479,6 +490,7 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
     currentKeyRequest = null;
 
     if (response instanceof Exception) {
+      Log.e(WebUtil.DEBUG, name + " key acquire fail - " + response);
       onKeysError((Exception) response);
       return;
     }
@@ -500,7 +512,9 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull;
         state = STATE_OPENED_WITH_KEYS;
         dispatchEvent(DrmSessionEventListener.EventDispatcher::drmKeysLoaded);
       }
+      Log.d(WebUtil.DEBUG, name + " key acquired");
     } catch (Exception e) {
+      Log.e(WebUtil.DEBUG, name + " key store fail - " + e);
       onKeysError(e);
     }
   }
