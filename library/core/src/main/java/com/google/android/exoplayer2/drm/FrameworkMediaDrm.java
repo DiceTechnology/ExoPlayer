@@ -306,7 +306,7 @@ public final class FrameworkMediaDrm implements ExoMediaDrm {
     return FrameworkMediaCrypto.class;
   }
 
-  private static SchemeData getSchemeData(UUID uuid, List<SchemeData> schemeDatas) {
+  protected static SchemeData getSchemeData(UUID uuid, List<SchemeData> schemeDatas) {
     if (!C.WIDEVINE_UUID.equals(uuid)) {
       // For non-Widevine CDMs always use the first scheme data.
       return schemeDatas.get(0);

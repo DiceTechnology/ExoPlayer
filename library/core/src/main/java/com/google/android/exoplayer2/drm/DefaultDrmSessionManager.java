@@ -29,6 +29,9 @@ import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.drm.DrmInitData.SchemeData;
 import com.google.android.exoplayer2.drm.DrmSession.DrmSessionException;
 import com.google.android.exoplayer2.drm.ExoMediaDrm.OnEventListener;
+import com.google.android.exoplayer2.endeavor.DebugUtil;
+import com.google.android.exoplayer2.endeavor.WebUtil;
+import com.google.android.exoplayer2.extractor.mp4.PsshAtomUtil;
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy;
 import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy;
 import com.google.android.exoplayer2.util.Assertions;
@@ -488,6 +491,13 @@ public class DefaultDrmSessionManager implements DrmSessionManager {
     if (offlineLicenseKeySetId == null) {
       schemeDatas = getSchemeDatas(Assertions.checkNotNull(format.drmInitData), uuid, false);
       if (schemeDatas.isEmpty()) {
+        int sz = format.drmInitData.schemeDataCount;
+        String info = "missing scheme data, drmInitData size " + sz;
+        for (int i = 0; i < sz; i++) {
+          SchemeData schemeData = format.drmInitData.get(i);
+          info += (schemeData == null ? ", [empty" : ", [" + schemeData.data.length) + ": " + schemeData.uuid.toString() + "]";
+        }
+        Log.d(WebUtil.DEBUG, info);
         final MissingSchemeDataException error = new MissingSchemeDataException(uuid);
         if (eventDispatcher != null) {
           eventDispatcher.drmSessionManagerError(error);
@@ -625,6 +635,20 @@ public class DefaultDrmSessionManager implements DrmSessionManager {
       @Nullable List<SchemeData> schemeDatas,
       boolean isPlaceholderSession,
       @Nullable DrmSessionEventListener.EventDispatcher eventDispatcher) {
+    String keyId = null;
+    if (DebugUtil.debug_drm && !isPlaceholderSession) {
+      keyId = "size " + schemeDatas.size();
+      SchemeData schemeData = FrameworkMediaDrm.getSchemeData(C.WIDEVINE_UUID, schemeDatas);
+      UUID[] keyIds = PsshAtomUtil.parseKeyIds(schemeData.data, C.WIDEVINE_UUID);
+      if (keyIds != null && keyIds.length > 0) {
+        for (UUID uuid : keyIds) {
+          keyId += ", " + uuid.toString();
+        }
+      }
+    }
+    if (keyId != null) {
+      Log.d(WebUtil.DEBUG, "drmSession creating step 1..." + keyId);
+    }
     DefaultDrmSession session =
         createAndAcquireSession(schemeDatas, isPlaceholderSession, eventDispatcher);
     if (session.getState() == DrmSession.STATE_ERROR
@@ -635,6 +659,9 @@ public class DefaultDrmSessionManager implements DrmSessionManager {
       // ResourceBusyException is only available at API 19, so on earlier versions we always
       // eagerly release regardless of the underlying error.
       if (!keepaliveSessions.isEmpty()) {
+        if (keyId != null) {
+          Log.d(WebUtil.DEBUG, "drmSession creating step 2..." + keyId);
+        }
         // Make a local copy, because sessions are removed from this.keepaliveSessions during
         // release (via callback).
         ImmutableSet<DefaultDrmSession> keepaliveSessions =
@@ -649,6 +676,9 @@ public class DefaultDrmSessionManager implements DrmSessionManager {
         }
         session = createAndAcquireSession(schemeDatas, isPlaceholderSession, eventDispatcher);
       }
+    }
+    if (keyId != null) {
+      Log.d(WebUtil.DEBUG, "drmSession create done! " + keyId);
     }
     return session;
   }

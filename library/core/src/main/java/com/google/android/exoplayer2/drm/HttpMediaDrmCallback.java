@@ -21,12 +21,14 @@ import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.drm.ExoMediaDrm.KeyRequest;
 import com.google.android.exoplayer2.drm.ExoMediaDrm.ProvisionRequest;
+import com.google.android.exoplayer2.endeavor.WebUtil;
 import com.google.android.exoplayer2.upstream.DataSourceInputStream;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.HttpDataSource.InvalidResponseCodeException;
 import com.google.android.exoplayer2.upstream.StatsDataSource;
 import com.google.android.exoplayer2.util.Assertions;
+import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
@@ -116,6 +118,8 @@ public final class HttpMediaDrmCallback implements MediaDrmCallback {
       throws MediaDrmCallbackException {
     String url =
         request.getDefaultUrl() + "&signedRequest=" + Util.fromUtf8Bytes(request.getData());
+
+    Log.d(WebUtil.DEBUG, "drmSession provision request [" + url + "]");
     return executePost(
         dataSourceFactory,
         url,
@@ -150,6 +154,14 @@ public final class HttpMediaDrmCallback implements MediaDrmCallback {
     synchronized (keyRequestProperties) {
       requestProperties.putAll(keyRequestProperties);
     }
+
+    String msg = url;
+    String token = requestProperties.get("Authorization");
+    if (!TextUtils.isEmpty(token)) {
+      msg += ", X-DRM-INFO " + requestProperties.get("X-DRM-INFO");
+      msg += ", Authorization " + token;
+    }
+    Log.d(WebUtil.DEBUG, "drmSession key request [" + msg + "]");
     return executePost(dataSourceFactory, url, request.getData(), requestProperties);
   }
 
