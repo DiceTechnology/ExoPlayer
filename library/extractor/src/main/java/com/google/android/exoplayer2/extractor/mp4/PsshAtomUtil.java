@@ -15,6 +15,8 @@
  */
 package com.google.android.exoplayer2.extractor.mp4;
 
+import static com.google.android.exoplayer2.endeavor.WidevineCencHeaderParser.WidevineCencHeader;
+
 import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.ParsableByteArray;
@@ -210,11 +212,24 @@ public final class PsshAtomUtil {
     atomData.readBytes(data, 0, dataSize);
 
     if (atomVersion == 0) {
-      ParsableByteArray schemeData = new ParsableByteArray(data);
-      if (schemeData.limit() >= 4 + 16 /* UUID */) {
-        schemeData.setPosition(4);
-        keyIds = new UUID[] {new UUID(schemeData.readLong(), schemeData.readLong())};
+      try {
+        WidevineCencHeader header = WidevineCencHeader.parseFrom(data);
+        int keyIdCount = header.getKeyIdCount();
+        if (keyIdCount > 0) {
+          keyIds = new UUID[keyIdCount];
+          for (int i = 0; i < keyIdCount; i++) {
+            ParsableByteArray keyData = new ParsableByteArray(header.getKeyId(i).toByteArray());
+            keyIds[i] = new UUID(keyData.readLong(), keyData.readLong());
+          }
+        }
+      } catch (Exception e) {
+        Log.e(TAG, "get keyIds failed", e);
       }
+//      ParsableByteArray schemeData = new ParsableByteArray(data);
+//      if (schemeData.limit() >= 4 + 16 /* UUID */) {
+//        schemeData.setPosition(4);
+//        keyIds = new UUID[] {new UUID(schemeData.readLong(), schemeData.readLong())};
+//      }
     }
     return new PsshAtom(uuid, atomVersion, data).withKeyIds(keyIds);
   }
